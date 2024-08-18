@@ -1,9 +1,6 @@
-
 #!/usr/bin/env python3
 """
-Description: The goal here is that if between two queries, certain rows are
-             removed from the dataset, the user does not miss items from
-             dataset when changing page
+Deletion-resilient hypermedia pagination
 """
 
 import csv
@@ -17,7 +14,6 @@ class Server:
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
-        ''' Initialize instance. '''
         self.__dataset = None
         self.__indexed_dataset = None
 
@@ -44,31 +40,21 @@ class Server:
         return self.__indexed_dataset
 
     def get_hyper_index(self, index: int = None, page_size: int = 10) -> Dict:
-        ''' Return dict of pagination data.
-            Dict key/value pairs consist of the following:
-              index - the start index of the page
-              next_index - the start index of the next page
-              page_size
-              page_size - the number of items on the page
-              data - the data in the page itself '''
+        """return a dictionary with the following key-value pairs"""
+
+        assert type(index) == int and type(page_size) == int
         assert 0 <= index < len(self.dataset())
-
-        indexed_dataset = self.indexed_dataset()
-        indexed_page = {}
-
-        i = index
-        while (len(indexed_page) < page_size and i < len(self.dataset())):
-            if i in indexed_dataset:
-                indexed_page[i] = indexed_dataset[i]
-            i += 1
-
-        page = list(indexed_page.values())
-        page_indices = indexed_page.keys()
-
+        dataset = self.indexed_dataset()
+        data = []
+        next_index = index
+        for _ in range(page_size):
+            while not dataset.get(next_index):
+                next_index += 1
+            data.append(dataset.get(next_index))
+            next_index += 1
         return {
             'index': index,
-            'next_index': max(page_indices) + 1,
-            'page_size': len(page),
-            'data': page
+            'next_index': next_index,
+            'page_size': page_size,
+            'data': data
         }
-
