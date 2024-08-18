@@ -1,15 +1,16 @@
-
 #!/usr/bin/env python3
-'''Description: Implementing a method named get_page that takes two integer
-                arguments page with default value 1 and page_size with
-                default value 10.
-'''
+"""Simple pagination"""
+
 
 import csv
 import math
-from typing import List
+from typing import Tuple, List
 
-index_range = __import__('0-simple_helper_function').index_range
+
+def index_range(page: int, page_size: int) -> Tuple[int, int]:
+    """return a tuple of size two containing a start index and an end index"""
+
+    return (page * page_size - page_size, page * page_size)
 
 
 class Server:
@@ -18,7 +19,6 @@ class Server:
     DATA_FILE = "Popular_Baby_Names.csv"
 
     def __init__(self):
-        ''' Initialize instance. '''
         self.__dataset = None
 
     def dataset(self) -> List[List]:
@@ -33,16 +33,9 @@ class Server:
         return self.__dataset
 
     def get_page(self, page: int = 1, page_size: int = 10) -> List[List]:
-        ''' Output page of dataset. '''
-        assert isinstance(page, int) and isinstance(page_size, int)
+        """return list with the correct pagination"""
+
+        assert type(page) == int and type(page_size) == int
         assert page > 0 and page_size > 0
-
-        indices = index_range(page, page_size)
-        start = indices[0]
-        end = indices[1]
-
-        try:
-            return self.dataset()[start:end]
-        except IndexError:
-            return []
-
+        start, end = index_range(page, page_size)
+        return self.dataset()[start:end]
