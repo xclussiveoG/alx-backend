@@ -1,4 +1,3 @@
-
 #!/usr/bin/python3
 """Create FIFOCache class that inherits from BaseCaching"""
 BaseCaching = __import__('base_caching').BaseCaching
@@ -27,4 +26,3 @@ class FIFOCache(BaseCaching):
     def get(self, key):
         """ Output the value associated with the given key """
         return self.cache_data.get(key)
-
